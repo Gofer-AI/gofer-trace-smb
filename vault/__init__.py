@@ -1,0 +1,1 @@
+"""Obsidian vault access boundary."""

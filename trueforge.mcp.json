@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "gofer-trace-vault": {
+      "command": "python",
+      "args": ["-m", "vault.mcp_server"],
+      "env": {"GOFER_VAULT": "demo-vault"}
+    }
+  }
+}

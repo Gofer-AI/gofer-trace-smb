@@ -1,0 +1,7 @@
+{
+  "product": "widgets",
+  "prices": {
+    "acme": 8.5,
+    "borealis": 8.2
+  }
+}
