@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+cache/*.json
+!cache/weekly-reorder-fallback.json
+demo-vault/Log/*.md
+!demo-vault/Log/.gitkeep
+

@@ -1,0 +1,13 @@
+{
+  "name": "Weekly supplier reorder",
+  "steps": [
+    {"n": 1, "action": "Open inventory note", "tool": "vault", "inputs": "widgets", "expected": "current stock", "sensitive": false},
+    {"n": 2, "action": "Check reorder threshold", "tool": "vault", "inputs": "inventory", "expected": "required quantity", "sensitive": false},
+    {"n": 3, "action": "Read Acme supplier record", "tool": "vault", "inputs": "Acme", "expected": "supplier terms", "sensitive": false},
+    {"n": 4, "action": "Fetch current prices", "tool": "bright_data", "inputs": "widgets", "expected": "market prices", "sensitive": false},
+    {"n": 5, "action": "Place simulated purchase order", "tool": "sandbox", "inputs": "quantity, unit price", "expected": "simulated PO", "sensitive": true, "sensitive_reason": "spends money"},
+    {"n": 6, "action": "Record the run", "tool": "vault", "inputs": "summary", "expected": "audit notes", "sensitive": false}
+  ],
+  "tools_required": ["vault", "bright_data", "sandbox"],
+  "preconditions": ["Stock level below reorder threshold"]
+}
