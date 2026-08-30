@@ -1,0 +1,8 @@
+[pr_reviewer]
+require_score_review = true
+extra_instructions = """
+Treat the pull request as an implementation of an agent request. Prioritize logic bugs,
+violations of policy or filesystem boundaries, unintended external side effects, data loss,
+credential exposure, changes outside the stated request, missing rollback behavior, and
+missing tests. Qodo review is advisory and must not be represented as human approval.
+"""

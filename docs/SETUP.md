@@ -96,50 +96,40 @@ Reset the smoke-test log/changelog before the stage demo so the audit trail star
 
 ## 4. Add the real recording
 
-Record the weekly reorder and save it as:
+Use **Record workflow** in the Gofer interface and select **Extract workflow** when the demonstration
+is complete. The UI stages the raw video locally and submits its opaque upload ID through the
+TrueForge SDK. TrueForge then calls `extract_workflow_from_recording`; there is no direct UI-to-Python
+extraction shortcut. The MCP tool deletes the staged video after success or failure.
 
-```text
-samples/weekly-reorder.mp4
-```
+For a live extraction, set `GOFER_OFFLINE=0` and ensure ffmpeg and the configured OpenAI model are
+available. Extraction results remain cached by video hash, making subsequent demonstrations faster.
 
-For a live extraction, run this from a Python shell:
-
-```bash
-python - <<'PY'
-from trace.extract import extract_workflow
-from trace.to_markdown import write_workflow
-
-video = "samples/weekly-reorder.mp4"
-workflow = extract_workflow(video)
-print(write_workflow(workflow, video, "demo-vault"))
-PY
-```
-
-Run it once before presenting. The output is cached by video hash, making subsequent
-demonstrations fast and resilient to network failure.
-
-## 5. Run the UI
+## 5. Run TrueForge and the SDK UI
 
 ```bash
 GOFER_OFFLINE=1 python app.py
+npm run dev:trueforge
+# Configure a model at http://localhost:8790, then run:
+TRUEFORGE_MODEL=openai/gpt-4o npm run configure:trueforge
+npm run dev:ui
 ```
 
-Open `http://127.0.0.1:7860` and verify the three panes are visible. The committed offline
+Open `http://127.0.0.1:5173` and verify the TrueForge SDK chat is visible. The committed offline
 price should produce **40 units × $8.50 = $340**.
 
 ## 6. Rehearse the winning two-run demo
 
 ### First run: approval fires
 
-1. Click **Do the weekly reorder**.
-2. Watch the right pane highlight the workflow, supplier, and policy notes.
-3. Confirm the middle pane displays the `$340` proposal and this exact policy text:
+1. Ask the `gofer-smb` agent: **Do the weekly reorder**.
+2. Expand TrueForge's **Agent steps** to watch the workflow, supplier, pricing, and policy tool calls.
+3. Confirm the response displays the `$340` proposal and this exact policy text:
 
    ```text
    $200-$500 — notify owner, proceed after 1h
    ```
 
-4. Click **Approve simulated order**.
+4. Approve the TrueForge human checkpoint.
 5. Confirm one new note appears in `demo-vault/Log/` and one line is appended to
    `demo-vault/changelog.md`.
 
@@ -147,7 +137,7 @@ price should produce **40 units × $8.50 = $340**.
 
 1. Open `demo-vault/Policies/spending-limits.md` in Obsidian or a text editor.
 2. Change only `under $200` to `under $500` and save.
-3. Click **Re-run with current policy** without restarting the app.
+3. Ask the agent to run the weekly reorder again without restarting any service.
 4. Confirm the same `$340` proposal auto-approves and no gate is shown.
 5. Restore the original `$200` policy after rehearsal.
 
@@ -159,6 +149,8 @@ business owns its brain.”**
 ```bash
 pytest -q
 python -m compileall -q agent trace vault app.py scripts/preflight.py
+npm run typecheck
+npm run build
 git diff --check
 git status --short
 ```

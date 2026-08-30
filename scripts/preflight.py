@@ -17,8 +17,15 @@ REQUIRED_NOTES = (
     "Suppliers/borealis.md",
     "Inventory/widgets.md",
     "Workflows/weekly-reorder.md",
+    "Company/profile.md",
+    "Company/news-watchlist.md",
+    "Tasks/Today.md",
+    "Tasks/Inbox.md",
+    "News/README.md",
+    "Workflows/daily-company-brief.md",
+    "Workflows/qodo-request-audit.md",
 )
-REQUIRED_MODULES = ("gradio", "mcp", "openai", "pydantic", "dotenv")
+REQUIRED_MODULES = ("mcp", "openai", "pydantic", "dotenv")
 
 
 def check(label: str, passed: bool, guidance: str = "") -> bool:
@@ -28,11 +35,21 @@ def check(label: str, passed: bool, guidance: str = "") -> bool:
     return passed
 
 
+def warn(label: str, guidance: str) -> bool:
+    print(f"[WARN] {label} — {guidance}")
+    return True
+
+
 def main() -> int:
     results: list[bool] = []
+    offline = os.getenv("GOFER_OFFLINE") == "1"
     version_ok = sys.version_info[:2] == (3, 11)
     results.append(check("Python 3.11", version_ok, f"found {sys.version.split()[0]}"))
-    results.append(check("ffmpeg", shutil.which("ffmpeg") is not None, "install ffmpeg for live video extraction"))
+    ffmpeg_ready = shutil.which("ffmpeg") is not None
+    if offline and not ffmpeg_ready:
+        results.append(warn("ffmpeg", "not installed; the committed workflow fixture will be used"))
+    else:
+        results.append(check("ffmpeg", ffmpeg_ready, "install ffmpeg for live video extraction"))
 
     missing_modules = [name for name in REQUIRED_MODULES if importlib.util.find_spec(name) is None]
     results.append(check("Python dependencies", not missing_modules, "missing: " + ", ".join(missing_modules) if missing_modules else ""))
@@ -43,7 +60,6 @@ def main() -> int:
     results.append(check("Offline workflow fixture", (ROOT / "samples/weekly-reorder.json").is_file()))
     results.append(check("TrueForge MCP configuration", (ROOT / "trueforge.mcp.json").is_file()))
 
-    offline = os.getenv("GOFER_OFFLINE") == "1"
     live_keys = bool(os.getenv("OPENAI_API_KEY") and os.getenv("BRIGHTDATA_API_KEY") and os.getenv("BRIGHTDATA_DATASET_ID"))
     runtime_ready = offline or live_keys
     results.append(check(
@@ -53,7 +69,7 @@ def main() -> int:
     ))
 
     if all(results):
-        print("\nReady: run `python app.py` and connect `trueforge.mcp.json` in TrueForge.")
+        print("\nReady: start the MCP service with `python app.py`, then run TrueForge and the SDK UI.")
         return 0
     print("\nNot ready yet. Resolve FAIL items, then run this preflight again.")
     return 1

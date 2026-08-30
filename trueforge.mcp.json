@@ -1,9 +1,8 @@
 {
-  "mcpServers": {
-    "gofer-trace-vault": {
-      "command": "python",
-      "args": ["-m", "vault.mcp_server"],
-      "env": {"GOFER_VAULT": "demo-vault"}
-    }
+  "manifest": {
+    "type": "remote",
+    "name": "gofer-trace-vault",
+    "url": "http://127.0.0.1:8001/mcp",
+    "description": "Governed access to the Gofer SMB vault and offline supplier pricing."
   }
 }

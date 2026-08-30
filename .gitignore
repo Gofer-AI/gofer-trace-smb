@@ -1,10 +1,20 @@
 .env
 .venv/
+.uv-cache/
+.uv-python/
 __pycache__/
 .pytest_cache/
+.pytest-tmp/
+node_modules/
+dist/
+.trueforge-data/
+*.tsbuildinfo
 *.pyc
 cache/*.json
 !cache/weekly-reorder-fallback.json
 demo-vault/Log/*.md
 !demo-vault/Log/.gitkeep
+!demo-vault/Log/README.md
+demo-vault/.obsidian/workspace.json
+demo-vault/.obsidian/workspace-mobile.json
 
